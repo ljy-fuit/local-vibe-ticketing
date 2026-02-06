@@ -39,7 +39,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ticketing -d local_vibe_ticketing"]
       interval: 5s
-      timeout: 5s
+      timeout: 5
       retries: 5
 
   redis:
