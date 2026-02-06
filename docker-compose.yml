@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  ticketing-api:
+    build: .
+    ports:
+      - "46680:46680"
+    environment:
+      - NODE_ENV=development
+      - PORT=46680
+      - DATABASE_HOST=ticketing-db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=local_vibe_ticketing
+      - DATABASE_USER=ticketing
+      - DATABASE_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET}
+      - TOSS_SECRET_KEY=${TOSS_SECRET_KEY}
+      - TOSS_CLIENT_KEY=${TOSS_CLIENT_KEY}
+    depends_on:
+      ticketing-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src/ticketing/common/redis/lua-scripts:/app/dist/ticketing/common/redis/lua-scripts:ro
+
+  ticketing-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: local_vibe_ticketing
+      POSTGRES_USER: ticketing
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - ticketing_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticketing -d local_vibe_ticketing"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ticketing_data:
+  redis_data:
