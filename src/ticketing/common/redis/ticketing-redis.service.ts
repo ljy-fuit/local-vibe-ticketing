@@ -26,6 +26,7 @@ export class TicketingRedisService implements OnModuleInit, OnModuleDestroy {
       host,
       port,
       password: password || undefined,
+      tls: {},
       retryStrategy: (times) => Math.min(times * 50, 2000),
       maxRetriesPerRequest: 3,
     });
