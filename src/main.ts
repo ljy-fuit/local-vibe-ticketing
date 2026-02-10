@@ -35,7 +35,12 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT || 46680;
+  try {
   await app.listen(port, '0.0.0.0');
+  console.log(`Ticketing API is running on port ${port}`);
+} catch (err) {
+  console.error('Failed to listen:', err);
+}
   console.log(`Ticketing API is running on port ${port}`);
 }
 bootstrap();
